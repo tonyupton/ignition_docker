@@ -1,0 +1,42 @@
+# Docker Compose Example for inductiveautomation/ignition
+# Compose Spec: https://github.com/compose-spec/compose-spec/blob/master/spec.md
+---
+services:
+  # Ignition Gateway
+  ignition:
+    image: inductiveautomation/ignition:latest
+    ports:
+      - 8088:8088
+      - 8043:8043
+      - 1883:1883
+    volumes:
+      - ignition-data:/usr/local/bin/ignition/data
+    # env_file: ignition.env  # optionally specify variables in a file, or using `environment:` below
+    environment:
+      - ACCEPT_IGNITION_EULA=Y
+      - GATEWAY_ADMIN_USERNAME=admin
+      - GATEWAY_ADMIN_PASSWORD_FILE=/run/secrets/gateway-admin-password
+      - IGNITION_EDITION=standard
+      - TZ=America/New_York  # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
+    secrets:
+      - gateway-admin-password
+    command: >
+      -n ignition-latest
+      -m 1024
+      --
+      wrapper.java.initmemory=512
+      -Dignition.allowunsignedmodules=true
+  sqlserver2019:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+ 
+secrets:
+  gateway-admin-password:
+    file: secrets/GATEWAY_ADMIN_PASSWORD
+ 
+volumes:
+  ignition-data:
