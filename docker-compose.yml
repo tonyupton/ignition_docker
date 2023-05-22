@@ -1,42 +1,67 @@
-# Docker Compose Example for inductiveautomation/ignition
-# Compose Spec: https://github.com/compose-spec/compose-spec/blob/master/spec.md
----
+version: "3.7"
+
+
 services:
   # Ignition Gateway
   ignition:
+    container_name: ignition
     image: inductiveautomation/ignition:latest
     ports:
       - 8088:8088
       - 8043:8043
-      - 1883:1883
     volumes:
       - ignition-data:/usr/local/bin/ignition/data
     # env_file: ignition.env  # optionally specify variables in a file, or using `environment:` below
     environment:
       - ACCEPT_IGNITION_EULA=Y
       - GATEWAY_ADMIN_USERNAME=admin
-      - GATEWAY_ADMIN_PASSWORD_FILE=/run/secrets/gateway-admin-password
+      - GATEWAY_ADMIN_PASSWORD=password
       - IGNITION_EDITION=standard
       - TZ=America/New_York  # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
-    secrets:
-      - gateway-admin-password
     command: >
-      -n ignition-latest
+      -n ignition-dev
       -m 1024
       --
       wrapper.java.initmemory=512
       -Dignition.allowunsignedmodules=true
+  
+  # Microsoft SQL Server 2019 Database
   sqlserver2019:
+    container_name: sqlserver2019
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       SA_PASSWORD: "YourStrong!Passw0rd"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
- 
-secrets:
-  gateway-admin-password:
-    file: secrets/GATEWAY_ADMIN_PASSWORD
- 
+  
+  # Node-Red
+  node-red:
+    container_name: node-red
+    image: nodered/node-red:latest
+    environment:
+      - TZ=America/New_York  # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
+    ports:
+      - "1880:1880"
+    volumes:
+      - node-red-data:/data
+
+  # HiveMQ Community Edition
+  hivemq:
+    container_name: hivemq
+    image: hivemq/hivemq-ce:latest
+    restart: always
+    ports:
+      - "1883:1883"
+      - "8080:8080"
+    volumes:
+      - hivemq-data-volume:/opt/hivemq/data
+      - hivemq-log-volume:/opt/hivemq/log
+      - hivemq-conf-volume:/opt/hivemq/conf
+
 volumes:
   ignition-data:
+  node-red-data:
+  hivemq-data-volume:
+  hivemq-log-volume:
+  hivemq-conf-volume:
