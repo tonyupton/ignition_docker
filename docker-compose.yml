@@ -51,7 +51,6 @@ services:
   hivemq:
     container_name: hivemq
     image: hivemq/hivemq-ce:latest
-    restart: always
     ports:
       - "1883:1883"
       - "8080:8080"
