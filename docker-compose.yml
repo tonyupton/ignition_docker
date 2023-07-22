@@ -35,34 +35,7 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver2019-data:/var/opt/mssql
-  
-  # Node-Red
-  node-red:
-    container_name: node-red
-    image: nodered/node-red:latest
-    environment:
-      - TZ=America/New_York  # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
-    ports:
-      - "1880:1880"
-    volumes:
-      - node-red-data:/data
-
-  # HiveMQ Community Edition
-  hivemq:
-    container_name: hivemq
-    image: hivemq/hivemq-ce:latest
-    ports:
-      - "1883:1883"
-      - "8080:8080"
-    volumes:
-      - hivemq-data-volume:/opt/hivemq/data
-      - hivemq-log-volume:/opt/hivemq/log
-      - hivemq-conf-volume:/opt/hivemq/conf
 
 volumes:
   ignition-data:
   sqlserver2019-data:
-  node-red-data:
-  hivemq-data-volume:
-  hivemq-log-volume:
-  hivemq-conf-volume:
