@@ -2,8 +2,7 @@ version: "3.7"
 
 services:
   # Ignition Gateway
-  ignition:
-    container_name: ignition
+  gateway:
     image: inductiveautomation/ignition:latest
     ports:
       - 8088:8088
@@ -18,24 +17,23 @@ services:
       - IGNITION_EDITION=standard
       - TZ=America/New_York  # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
     command: >
-      -n ignition-dev
+      -n ignition-docker
       -m 1024
       --
       wrapper.java.initmemory=512
       -Dignition.allowunsignedmodules=true
   
-  # Microsoft SQL Server 2019 Database
-  sqlserver2019:
-    container_name: sqlserver2019
-    image: mcr.microsoft.com/mssql/server:2019-latest
+  # Microsoft SQL Server 2022 Database
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
+      SA_PASSWORD: "password"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
     volumes:
-      - sqlserver2019-data:/var/opt/mssql
+      - db-data:/var/opt/mssql
 
 volumes:
-  ignition-data:
-  sqlserver2019-data:
+  gateway-data:
+  db-data:
