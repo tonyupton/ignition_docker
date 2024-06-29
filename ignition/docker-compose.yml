@@ -8,7 +8,7 @@ services:
       - 8088:8088
       - 8043:8043
     volumes:
-      - ignition-data:/usr/local/bin/ignition/data
+      - gateway-data:/usr/local/bin/ignition/data
     # env_file: ignition.env  # optionally specify variables in a file, or using `environment:` below
     environment:
       - ACCEPT_IGNITION_EULA=Y
@@ -27,7 +27,7 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: "password"
+      MSSQL_SA_PASSWORD: "yourStrong(!)Password"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
