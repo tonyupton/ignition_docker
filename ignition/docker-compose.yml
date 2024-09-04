@@ -22,6 +22,7 @@ services:
       -n ignition-docker
       -m 1024
       --
+      wrapper.java.maxmemory=2048
       wrapper.java.initmemory=512
       -Dignition.allowunsignedmodules=true
   
