@@ -1,9 +1,9 @@
-version: "3.7"
 
 services:
   # Ignition Gateway
   gateway:
     image: inductiveautomation/ignition:latest
+    restart: unless-stopped
     ports:
       - 8088:8088
       - 8043:8043
@@ -16,27 +16,43 @@ services:
       - ACCEPT_IGNITION_EULA=Y
       - GATEWAY_ADMIN_USERNAME=admin
       - GATEWAY_ADMIN_PASSWORD=password
-      - IGNITION_EDITION=standard
-      - TZ=America/New_York  # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
     command: >
       -n ignition-docker
       -m 1024
       --
-      wrapper.java.maxmemory=2048
+      wrapper.java.maxmemory=4096
       wrapper.java.initmemory=512
       -Dignition.allowunsignedmodules=true
   
-  # Microsoft SQL Server 2022 Database
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+  # PostgreSQL Database
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
     environment:
-      MSSQL_SA_PASSWORD: "yourStrong(!)Password"
-      ACCEPT_EULA: "Y"
+      POSTGRES_DB: ignition
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     ports:
-      - "1433:1433"
+      - 5432:5432
     volumes:
-      - db-data:/var/opt/mssql
+      - postgres-data:/var/lib/postgresql
+
+  # pgAdmin for PostgreSQL management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - 5050:80
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
 
 volumes:
   gateway-data:
-  db-data:
+  postgres-data:
+  pgadmin-data:
